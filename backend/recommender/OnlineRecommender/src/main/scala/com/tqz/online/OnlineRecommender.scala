@@ -85,7 +85,7 @@ object OnlineRecommender {
       LocationStrategies.PreferConsistent,
       ConsumerStrategies.Subscribe[String, String](Array(config("kafka.topic")), kafkaParam)
     )
-    // 对kafkaStream进行处理，产生评分流，userId|productId|score|timestamp
+    // 对kafkaStream进行处理，产生评分流，use rId|productId|score|timestamp
     val ratingStream = kafkaStream.map { msg =>
       var attr = msg.value().split("\\|")
       (attr(0).toInt, attr(1).toInt, attr(2).toDouble, attr(3).toInt)
@@ -107,7 +107,7 @@ object OnlineRecommender {
             // 2. 从相似度矩阵中获取当前商品最相似的商品列表，作为备选列表，保存成一个数组 Array[productId]
             val candidateProducts = getTopSimProducts(MAX_SIM_PRODUCTS_NUM, productId, userId, simProductsMatrixBC.value)
 
-            // 3. 计算每个备选商品的推荐优先级，得到当前用户的实时推荐列表，保存成 Array[(productId, score)]
+            // 3. 计算每个备选商品的推荐优先级，得到当前用户的实时推荐列表，保存成 Array[(productId,score)]
             val streamRecs = computeProductScore(candidateProducts, userRecentlyRatings, simProductsMatrixBC.value)
 
             // 4. 把推荐列表保存到 mongodb
@@ -133,7 +133,7 @@ object OnlineRecommender {
   import scala.collection.JavaConversions._
 
   def getUserRecentlyRatings(num: Int, userId: Int, jedis: Jedis): Array[(Int, Double)] = {
-    // 从 redis 中用户的评分队列里获取评分数据，list键名为 uid:USERID，值格式是 PRODUCTID:SCORE
+    // 从 redis 中用户的评分队列里获取评分数据，key为uid:USERID，value为 PRODUCTID:SCORE
     jedis.lrange("userId:" + userId.toString, 0, num)
       .map { item =>
         val attr = item.split("\\:")
@@ -171,7 +171,7 @@ object OnlineRecommender {
         item.get("productId").toString.toInt
       }
     // 从所有的相似商品中进行过滤
-    // 如果 allSimProducts 里面的某一项在 ratingExist 里面的话就要过滤，应该 productId 取不在 ratingExist 里面的数据
+    // 如果 allSimProducts 里面的某一项在 ratingExist 里面的话就要过滤，应该取productId 不在 ratingExist 里面的数据
     allSimProducts.filter(x => !ratingExist.contains(x._1)) // x 的格式上岗面提到过，就是(productId, score)
       .sortWith(_._2 > _._2) // 按照 score 降序排序
       .take(num)
@@ -207,6 +207,7 @@ object OnlineRecommender {
       if (simScore > 0.4) {
         // 按照公式进行加权计算，得到基础评分
         scores += ((candidateProduct, simScore * userRecentlyRating._2))
+        //用户评分大于3，增强因子加1，否则，减弱因子加1
         if (userRecentlyRating._2 > 3) {
           // 在增强因子 map 中给 productId 的 score 加 1
           increMap(candidateProduct) = increMap.getOrDefault(candidateProduct, 0) + 1

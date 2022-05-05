@@ -9,13 +9,13 @@ case class ProductRating(userId: Int, productId: Int, score: Double, timestamp: 
 
 case class MongoConfig(uri: String, db: String)
 
-// 定义标准推荐对象
+// 定义标准推荐对象(样例类)
 case class Recommendation(productId: Int, score: Double)
 
-// 定义用户的推荐列表
+// 定义用户的推荐列表(样例类)
 case class UserRecs(userId: Int, recs: Seq[Recommendation])
 
-// 定义商品相似度列表
+// 定义商品相似度列表(样例类)
 case class ProductRecs(productId: Int, recs: Seq[Recommendation])
 
 object OfflineRecommender {
@@ -61,7 +61,7 @@ object OfflineRecommender {
     // 核心计算过程
     // 1. 训练隐语义模型
     val trainData = ratingRDD.map(x => Rating(x._1, x._2, x._3))
-    // 定义模型训练的参数，rank隐特征个数，iterations迭代词数，lambda正则化系数
+    // 定义模型训练的参数，rank隐特征个数，iterations迭代次数，lambda正则化系数
     val (rank, iterations, lambda) = (5, 10, 0.1)
     // rank：表示隐特征的维度 K
     // iterations：迭代次数，交替相乘的次数
@@ -69,7 +69,7 @@ object OfflineRecommender {
 
 
     // 2. 获得预测评分矩阵，得到用户的推荐列表
-    // 用userRDD和productRDD做一个笛卡尔积，得到空的userProductsRDD表示的评分矩阵
+    // 用userRDD和productRDD做一个笛卡尔积，得到空的userProductsRDD表示的预测评分矩阵
     val userProducts = userRDD.cartesian(productRDD)
     val preRating = model.predict(userProducts)
 
@@ -81,6 +81,7 @@ object OfflineRecommender {
       .groupByKey()
       .map {
         case (userId, recs) =>
+          //将UserRecs的recs转换成list后按score降序排序后取前20个转化成UserRecs样例列的对象格式后再携带mongodb中(recommender数据库的UserRecs的collection中)
           UserRecs(userId, recs.toList.sortWith(_._2 > _._2).take(USER_MAX_RECOMMENDATION).map(x => Recommendation(x._1, x._2)))
       }
       .toDF()
@@ -91,7 +92,7 @@ object OfflineRecommender {
       .format("com.mongodb.spark.sql")
       .save()
 
-    // 3. 利用商品的特征向量，计算商品的相似度列表
+    // 3. 利用商品的特征向量，计算商品的相似度列表(主要用于后续的实时推荐)
     val productFeatures = model.productFeatures.map {
       case (productId, features) => (productId, new DoubleMatrix(features))
     }
@@ -99,7 +100,7 @@ object OfflineRecommender {
     val productRecs = productFeatures.cartesian(productFeatures)
       .filter {
         // 自己与自己做笛卡尔积，结果的相似度一定很高，所以要排除掉自己与自己做积
-        // a 就是做笛卡尔积的 this元素，b 就是 other 元素，他们不能是同一个
+        // a 就是做笛卡尔积的 this元素，b 就是 other 元素，他们不能是同一个(剔除自己和自己的配对)
         case (a, b) => a._1 != b._1
       }
       // 计算余弦相似度
@@ -109,6 +110,7 @@ object OfflineRecommender {
         val simScore = consinSim(a._2, b._2)
         (a._1, (b._1, simScore))
     }
+      //截取相似度大于0.4的商品
       .filter(_._2._2 > 0.4)
       .groupByKey()
       .map {

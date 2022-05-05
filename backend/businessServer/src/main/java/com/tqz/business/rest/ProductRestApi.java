@@ -156,6 +156,7 @@ public class ProductRestApi {
     @RequestMapping(value = "/rate/{id}", produces = "application/json", method = RequestMethod.GET)
     @ResponseBody
     public Model rateToProduct(@PathVariable("id") int id, @RequestParam("score") Double score, @RequestParam("username") String username, Model model) {
+        long startTime = System.currentTimeMillis();
         try {
             User user = userService.findByUsername(username);
             ProductRatingRequest request = new ProductRatingRequest(user.getUserId(), id, score);
@@ -173,7 +174,10 @@ public class ProductRestApi {
         } catch (Exception e) {
             model.addAttribute("success", false);
             model.addAttribute("msg", e.getMessage());
+            e.printStackTrace();
         }
+        long duration = System.currentTimeMillis() - startTime;
+        logger.info("query duration " + duration + " ms");
         return model;
     }
 

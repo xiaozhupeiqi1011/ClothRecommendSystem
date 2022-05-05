@@ -2,6 +2,7 @@ package com.tqz.business.service;
 
 import com.tqz.business.model.domain.Product;
 import com.tqz.business.model.recom.Recommendation;
+import com.tqz.business.model.request.ProductUpload;
 import com.tqz.business.utils.Constant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoClient;
@@ -49,6 +50,10 @@ public class ProductService {
         return getProducts(ids);
     }
 
+    public void addProduct(ProductUpload productUpload) {
+        getProductCollection().insertOne(productToDocument(productUpload));
+    }
+
     private List<Product> getProducts(List<Integer> productIds) {
         FindIterable<Document> documents = getProductCollection().find(Filters.in("productId", productIds));
         List<Product> products = new ArrayList<>();
@@ -56,6 +61,16 @@ public class ProductService {
             products.add(documentToProduct(document));
         }
         return products;
+    }
+
+    private Document productToDocument(ProductUpload productUpload) {
+        Document document = new Document();
+        document.append("name", productUpload.getName());
+        document.append("categories", String.join("|", productUpload.getCategories()));
+        document.append("tags", String.join("|", productUpload.getTags()));
+        document.append("imageUrl", productUpload.getImage());
+        document.append("productId", Integer.valueOf((int) System.currentTimeMillis()));
+        return document;
     }
 
     private Product documentToProduct(Document document) {

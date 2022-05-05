@@ -1,7 +1,7 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
-export default class Home extends Vue {
+export default class Data extends Vue {
     // 实时推荐 
     // stream：StreamRecs
     public stream: any = []
@@ -122,12 +122,6 @@ export default class Home extends Vue {
             params: {
                 name: category
             }
-        })
-    }
-
-    public async jump(path: string) {
-        await this.$router.push({
-            name: path
         })
     }
 }

@@ -62,12 +62,6 @@ object ContentRecommender {
       原始特征通过 hash 函数，映射到一个索引值。
       后面只需要统计这些索引值的频率，就可以知道对应词的频率。
 
-      transform 方法会把词哈希成向量，结果类似于这样：(800,[67,259,267,350,579,652],[1.0,1.0,1.0,1.0,1.0,1.0])
-      800 表示纬度、特征向量数、哈希表的桶数
-      [67,259,267,350,579,652] 表示哈希到下标为这些数字上的词语
-      [1.0,1.0,1.0,1.0,1.0,1.0] 表示上面这些词出现的次数
-
-      注意：这是一个稀疏矩阵，只显示非 0 的结果
      */
     val hashingTF = new HashingTF().setInputCol("words").setOutputCol("rawFeatures").setNumFeatures(800)
     val featurizedDataDF = hashingTF.transform(wordsDataDF)
@@ -81,21 +75,6 @@ object ContentRecommender {
      */
     val idf = new IDF().setInputCol("rawFeatures").setOutputCol("features")
     val idfModel = idf.fit(featurizedDataDF)
-
-    /*
-      4.同时，调用 IDFModel 的 transform 方法，可以得到每一个单词对应的 TF-IDF 度量值。
-
-      得到增加新列 features 的 DF,该 DF 的格式是
-
-     ( productId, name, tags, words, rawFeatures, features)
-
-     ( 259637, 小狗钱钱, 书 少儿图书 教育类 童书 不错 孩子很喜欢
-     , [书, 少儿图书, 教育类, 童书, 不错, 孩子很喜欢]
-     , (800,[67,259,267,350,579,652],[1.0,1.0,1.0,1.0,1.0,1.0])
-     , (800,[67,259,267,350,579,652],[0.4638371143300716,2.272125885509337,3.188416617383492,3.4760986898352733,1.8021222562636017,3.8815637979434374])
-        |
-        |--> 这里最后一行的最后一组代表的就是 TF-IDF 度量值，通过观察发现 3.88 是最大值，也就是哈希到 652 桶里面的词最能代表本数据
-    */
     val rescaledDataDF = idfModel.transform(featurizedDataDF)
     /*
        经过 TF-IDF 提取之后，会过滤掉热门标签等因子对数据的干扰，现在的数据会更加符合用户喜好

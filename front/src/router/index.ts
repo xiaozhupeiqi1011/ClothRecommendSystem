@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 // 导入组件的时候只需要指定父级目录就行了，因为在父级的index.ts里面已经将全部的组件export出去了
-import { Login, Home, Detail, Search } from "@/views"
+import { Login, Home, Detail, Search, Category, Upload, Data } from "@/views"
 
 Vue.use(VueRouter)
 
@@ -26,6 +26,21 @@ const routes = [
     path: '/search',
     name: 'search',
     component: Search
+  },
+  {
+    path: '/category/:name',
+    name: 'category',
+    component: Category
+  },
+  {
+    path: '/upload',
+    name: 'upload',
+    component: Upload
+  },
+  {
+    path: '/data',
+    name: 'data',
+    component: Data
   }
 ]
 

@@ -104,7 +104,7 @@ object ItemCFRecommender {
         case (productId, recs) =>
           ProductRecs(productId, recs.toList
             .filter(x => x._1 != productId) // 在 recs 中过滤掉与 productId 相同的商品，不同自己推荐自己
-            .sortWith(_._2 > _._2) // 按照分数降序排序
+            .sortWith(_._2 > _._2) // 按照同现相似度降序排序
             .take(MAX_RECOMMENDATION)
             .map(x => Recommendation(x._1, x._2)) // 组装成被推荐列表的格式 (productId, score)
           ) // 最后封装成存入 MongoDB 的格式 (productId, 多个(productId, score))

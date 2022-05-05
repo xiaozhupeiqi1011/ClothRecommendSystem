@@ -36,18 +36,3 @@ h1 {
     margin-bottom: 0px;
 }
 
-.home-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-.el-card-anchor {
-    display: inline-flex;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    width: 33vw;
-    height: 35vh;
-    margin: 3em 1em;
-}

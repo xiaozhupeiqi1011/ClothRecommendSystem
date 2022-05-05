@@ -37,8 +37,9 @@ export default class Search extends Vue {
                     query: searchInput
                 }
             })
-            console.dir(res)
-            this.searchResult = res.data.products
+            console.log(res)
+            const array: any[] = res.data.products;
+            this.searchResult = array.filter(item => item != null)
         } catch (err) {
             console.error('请求：' + url + ' 异常 ' + err)
         }

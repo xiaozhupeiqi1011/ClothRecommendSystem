@@ -73,11 +73,11 @@ export default class Detail extends Vue {
         })
         console.dir(res)
         if (res.data.success == true) {
-            this.$alert('评分成功', '提示', {
+            await this.$alert('评分成功', '提示', {
                 confirmButtonText: '确定'
             });
         } else {
-            this.$alert('评分失败', '提示', {
+            await this.$alert('评分失败', '提示', {
                 confirmButtonText: '确定'
             });
         }

@@ -28,7 +28,7 @@ object ALSTrainer {
       .option("collection", MONGODB_RATING_COLLECTION)
       .format("com.mongodb.spark.sql")
       .load()
-      .as[ProductRating]
+          .as[ProductRating]
       .rdd
       .map(
         rating => Rating(rating.userId, rating.productId, rating.score)

@@ -27,6 +27,7 @@ public class KafkaLogProducer {
         // 2. 指定生产者客户端连接 kafka 集群所需要的 broker 地址
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, HOST);
 
+        long startTime = System.currentTimeMillis();
         // 创建生产者客户端
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
@@ -38,5 +39,7 @@ public class KafkaLogProducer {
 
         // 关闭连接
         producer.close();
+        long endTime = System.currentTimeMillis();
+        System.out.println("duration " + (endTime - startTime) + " ms");
     }
 }

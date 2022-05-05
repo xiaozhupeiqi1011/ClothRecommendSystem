@@ -2,8 +2,8 @@
   <div class="container">
     <h1>搜索结果</h1>
 
-    <el-card v-for="item in searchResult" :key="item.productId + 1" class="card">
-      <router-link :to="{path: '/detail', query: {productId: item.productId} }" class="a-name">
+    <el-card v-for="item in searchResult" :key="(item.productId ? item.productId : 0) + 1" class="card">
+      <router-link :to="{path: '/detail', query: {productId: item.productId ? item.productId : 0} }" class="a-name">
         <h5 class="name">{{item.name}}</h5>
       </router-link>
       <img :src="item.imageUrl" alt="商品图片" class="image" />

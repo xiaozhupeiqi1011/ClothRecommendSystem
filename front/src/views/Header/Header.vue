@@ -6,7 +6,7 @@
     </div>
     <div class="search-container">
       <div class="search">
-        <el-input type="text" v-model="searchInput" :clearable="true" placeholder="搜索商品" />
+        <el-input type="text" v-model="searchInput" :clearable="true" placeholder="搜索服装" />
       </div>
       <div class="search-button">
         <el-button type="info" plain @click="doSearch">搜索</el-button>
