@@ -1,0 +1,88 @@
+.card {
+    display: inline-block;
+    width: 18%;
+    height: 350px;
+}
+
+.image {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 25%;
+}
+
+.name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; 
+}
+
+.more {
+    display: block;
+    text-decoration: none;
+    color: blue;
+}
+
+.a-name{
+    text-decoration: none;
+    color: black;
+}
+
+.a-name:hover {
+    text-decoration: underline;
+    color: red;
+}
+
+h1 {
+    margin-bottom: 0px;
+}
+
+#page-upload {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.img-box {
+    display: flex;
+    margin: 1em 0;
+}
+
+.img-input {
+    width: 65vw;
+    margin-right: 2em;
+}
+
+.img-input textarea {
+    height: 10em;
+}
+
+  .el-tag + .el-tag {
+    margin: 1em;
+  }
+
+  .el-tag, .el-button {
+    margin: 1em;
+  }
+
+  .button-new-tag {
+    margin: 1em;
+    width: 90px;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .input-new-tag {
+    margin: 1em;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+    width: unset !important;
+    vertical-align: bottom;
+  }
+
+.tag-input, .category-input {
+    padding: 1em;
+    text-align: left;
+}
